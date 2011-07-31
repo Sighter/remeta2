@@ -1,0 +1,24 @@
+drwxr-xr-x 2 sighter users  368 Jul 23 18:36 __pycache__/
+drwxr-xr-x 4 sighter users  680 Jul 21 01:05 stagger/
+drwxr-xr-x 5 sighter users  384 Jul 31 17:09 test.files/
+drwxr-xr-x 3 sighter users  176 Jul 20 14:12 uml/
+-rw-r--r-- 1 sighter users  15K Jul 23 18:25 Chemical.py
+-rw-r--r-- 1 sighter users 6.8K Jul 23 16:35 Chemical.pyc
+-rw-r--r-- 1 sighter users 2.1K Jul 23 18:19 File.py
+-rw-r--r-- 1 sighter users 2.2K Jul 23 18:23 File.pyc
+-rw-r--r-- 1 sighter users 2.3K Jul 22 20:46 Helpers.py
+-rw-r--r-- 1 sighter users 1.2K Jul 17 17:06 Helpers.pyc
+-rw-r--r-- 1 sighter users 7.0K Jul 23 18:35 Main.py
+-rw-r--r-- 1 sighter users 2.0K Jul 23 18:13 Pattern.py
+-rw-r--r-- 1 sighter users  990 Jul 21 00:07 Pattern.pyc
+-rw-r--r-- 1 sighter users 5.9K Jul 23 03:45 Release.py
+-rw-r--r-- 1 sighter users 4.4K Jul 23 16:24 Release.pyc
+-rw-r--r-- 1 sighter users  595 Jul 19 01:06 Remeta.py
+-rw-r--r-- 1 sighter users 3.6K Jul 22 19:34 Settings.py
+-rw-r--r-- 1 sighter users 2.1K Jul 18 17:07 Settings.pyc
+-rw-r--r-- 1 sighter users  801 Jul 21 01:23 TagHeader.py
+-rw-r--r-- 1 sighter users 1.1K Jul 22 01:21 TagHeader.pyc
+
+*.pyc
+test.files
+__pycache__
