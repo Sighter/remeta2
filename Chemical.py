@@ -32,9 +32,14 @@ class ResultPage:
         # set the base link for searching
         self.__BaseLink = r'http://www.chemical-records.co.uk/sc/search?SRI=true&inandout=true&ND=-1&Type=Music&must='
 
-        # split and replace white spaces
-        searchTerm = searchTerm.replace(" ", "+")
+        # strip whitespaces on the edges
         searchTerm = searchTerm.strip()
+
+        # replace white spaces
+        searchTerm = searchTerm.replace(" ", "+")
+
+        # remove ampersand from searchTerm
+        searchTerm = searchTerm.replace("&", "")
 
         #
         # get the web page source
