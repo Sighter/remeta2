@@ -6,6 +6,10 @@
 # @Created:     2011-07-18.
 # @Revision:    0.1
 
+import glob
+import os.path
+import re
+
 from Release import Release, Track
 from Helpers import ePrint
 from Helpers import ReplaceChars
@@ -85,6 +89,10 @@ class Main:
                 if not res_page.GetReleaseList():
                     # at first remove signs symbols and retry
                     search_term = ReplaceChars("/_()-.:,", " ", search_term)
+                    # strip "feat" terms
+                    p = re.compile(" feat ", re.IGNORECASE)
+                    search_term = p.sub("", search_term)
+
                     res_page = Chemical.ResultPage(search_term)
 
                     if not res_page.GetReleaseList():
