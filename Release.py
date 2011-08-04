@@ -8,6 +8,7 @@
 
 from File import File
 from Helpers import ePrint
+from Helpers import ReplaceChars
 
 class Track():
     """This class manges a track"""
@@ -170,7 +171,7 @@ class Release:
         # white spaces
         search_term_list = term.strip()
 
-        search_term_list = search_term_list.replace("(","").replace(")","")
+        search_term_list = search_term_list.replace("(","").replace(")","").lower()
 
         search_term_list = search_term_list.split()
 
@@ -188,12 +189,18 @@ class Release:
 
             # create target term
             search_target_list = item.Artist.lower() + " " + item.Title.lower()
+            search_target_list = ReplaceChars("/_()-.:,", " ", search_target_list)
             search_target_list = search_target_list.split()
+            print(search_target_list)
 
             # match
             for s in search_term_list:
                 if s in search_target_list:
                     item_hits += 1
+
+            # calculate a value wich is relative to the length of the search_target_list
+            item_hits = item_hits / len(search_target_list)
+            print(item_hits)
             
             # create a matchcount, item tupel
             match_list.append((item_hits, item))
