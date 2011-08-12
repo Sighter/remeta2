@@ -30,6 +30,8 @@ class File:
         self.Basename = path.basename(filePath)
         t, b = self.GetSuffix()
 
+        self.RelDir = ""
+
         # set type
         if t:
             self.Type = t

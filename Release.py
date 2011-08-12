@@ -30,6 +30,7 @@ class Track():
         self.Key = key
         self.SnippetLink = snippet_link
         self.FileInstance = None
+        self.Release = None
     
     ##============================= OPERATIONS ===================================##
 
@@ -191,7 +192,7 @@ class Release:
             search_target_list = item.Artist.lower() + " " + item.Title.lower()
             search_target_list = ReplaceChars("/_()-.:,", " ", search_target_list)
             search_target_list = search_target_list.split()
-            print(search_target_list)
+            ePrint(2, sFktname, "Matching against: "+ str(search_target_list))
 
             # match
             for s in search_term_list:
@@ -200,7 +201,7 @@ class Release:
 
             # calculate a value wich is relative to the length of the search_target_list
             item_hits = item_hits / len(search_target_list)
-            print(item_hits)
+            ePrint(2, sFktname, "Ranking points: " + str(item_hits))
             
             # create a matchcount, item tupel
             match_list.append((item_hits, item))

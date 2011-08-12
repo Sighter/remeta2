@@ -87,11 +87,12 @@ class Settings:
         # create filelist and searchterm list
         #
         self.FileList = []
+        self.DirList = []
         self.SearchTermList = []
 
         for entry in args:
             if path.isdir(entry):
-                pass
+                self.DirList.append(entry)
             elif path.isfile(entry):
                 # create a file object
                 self.FileList.append(File(entry))
@@ -122,6 +123,12 @@ class Settings:
 
     def HasSearchTerms(self):
         if len(self.SearchTermList):
+            return True
+        else:
+            return False
+
+    def HasDirs(self):
+        if len(self.DirList):
             return True
         else:
             return False

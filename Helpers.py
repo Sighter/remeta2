@@ -9,6 +9,7 @@
 
 import re
 import urllib
+from os import renames
 
 # function -- split_ld
 # @ string
@@ -121,3 +122,15 @@ def ReplaceChars(chars, dest, target):
         target = target.replace(c, dest)
 
     return target
+
+
+## method to rename a directory
+#
+def RenameDirQuery(source, dest):
+    ePrint(1, ":", "Rename DIR: " + source + " --> " + dest, end=" ? ")
+    choice = "k"
+    while choice != "y" and choice != "n":
+        choice = input("(y/n): ")
+
+    if choice == "y":
+        renames(source, dest)

@@ -11,8 +11,10 @@ import os.path
 import re
 
 from Release import Release, Track
+from File import File
 from Helpers import ePrint
 from Helpers import ReplaceChars
+from Helpers import RenameDirQuery
 import Chemical
 
 
@@ -42,9 +44,39 @@ class Main:
         filled_tracks = []
         unfilled_tracks = []
 
-        #
-        # Handle the FileList if existent
-        #
+        ##
+        ## Handle Directories (Release Search)
+        ##
+        if self.Settings.HasDirs():
+
+            # here we only link the files to specific dirs
+            # the next loop then cares about and first makes
+            # a search in a release cache
+
+            for folder in self.Settings.DirList:
+
+                #
+                # figure out the directory entries
+                #
+                file_list = glob.glob(os.path.join(folder, "*"))
+
+                if not file_list:
+                    ePrint(1, self.__ClassName, "Skipping directory " + folder)
+                    continue
+
+                ePrint(2, folder, "<-- Linking files")
+                ePrint(2, "Containing: ", str(file_list) + "\n")
+
+                # append them to the FileList
+                for file_path in file_list:
+                    f = File(file_path)
+                    f.RelDir = folder
+                    self.Settings.FileList.append(f)
+
+
+        ##
+        ## Handle the FileList if existent
+        ##
         if self.Settings.HasFiles():
             track_list = []
             
@@ -71,74 +103,89 @@ class Main:
                     continue
 
                 #
-                # otherwise search Chemical
+                # Look in the cache
                 #
+                rel_page = None
 
-                # if we have artist and filename availible set this as searchterm
-                if new_track.Artist and new_track.Title:
-                    search_term = new_track.Artist + " " + new_track.Title
-                else:
-                    # otherwise create search_term from filename
-                    search_term = new_track.FileInstance.NameBody
-                    ePrint(2, self.__ClassName, "Setting searchterm: " + search_term)
+                for t in filled_tracks:
+                    if new_track.FileInstance.RelDir != "" and \
+                       new_track.FileInstance.RelDir == t.FileInstance.RelDir and \
+                       t.Release:
+                           ePrint(2, self.__ClassName, "Using cache")
+                           rel_page = t.Release
+                           break
 
-                # link it up on chemical
-                res_page = Chemical.ResultPage(search_term)
+                if not rel_page:
+                    #
+                    # look at chemical if nothing is found in tags or cache
+                    #
 
-                # if we found nothing, we cut the searchterm
-                if not res_page.GetReleaseList():
-                    # at first remove signs symbols and retry
-                    search_term = ReplaceChars("/_()-.:,", " ", search_term)
-                    # strip "feat" terms
-                    p = re.compile(" feat ", re.IGNORECASE)
-                    search_term = p.sub("", search_term)
+                    # if we have artist and filename availible set this as searchterm
+                    if new_track.Artist and new_track.Title:
+                        search_term = new_track.Artist + " " + new_track.Title
+                    else:
+                        # otherwise create search_term from filename
+                        search_term = new_track.FileInstance.NameBody
+                        ePrint(2, self.__ClassName, "Setting searchterm: " + search_term)
 
+                    # link it up on chemical
                     res_page = Chemical.ResultPage(search_term)
 
+                    # if we found nothing, we cut the searchterm
                     if not res_page.GetReleaseList():
-                        # second remove numbers
-                        search_term = ReplaceChars("0123456789", " ", search_term)
+                        # at first remove signs symbols and retry
+                        search_term = ReplaceChars("/_()-.:,", " ", search_term)
+                        # strip "feat" terms
+                        p = re.compile(" feat ", re.IGNORECASE)
+                        search_term = p.sub("", search_term)
+
                         res_page = Chemical.ResultPage(search_term)
-                
-                
-                # if we finally found nothing, skip
-                if not res_page.GetReleaseList():
-                    ePrint(1, self.__ClassName, "Could not determine all fields for: " +
-                           new_track.FileInstance.Basename + "\n")
-                    unfilled_tracks.append(new_track)
-                    continue
-                
-                #
-                # now we process the result list
-                #
-                
-                # invoke the user if we have found more than one results
-                if len(res_page.GetReleaseList()) > 1:
-                    ePrint(1, self.__ClassName,
-                           "Multiple possilble releases found for: " + new_track.FileInstance.Basename +
-                           "Please type number. 0 to skip.")
-                    c = 1
-                    for r in res_page.GetReleaseList():
-                        print("{:4d} : {!s:.150}".format(c, r))
-                        c += 1
 
-                    choice = -1
-                    while choice < 0 or choice > len(res_page.GetReleaseList()):
-                        choice = int(input(" <-- "))
-
-                    if choice == 0:
-                        ePrint(1, self.__ClassName, "Skipping: " + new_track.FileInstance.Basename + "\n")
+                        if not res_page.GetReleaseList():
+                            # second remove numbers
+                            search_term = ReplaceChars("0123456789", " ", search_term)
+                            res_page = Chemical.ResultPage(search_term)
+                    
+                    
+                    # if we finally found nothing, skip
+                    if not res_page.GetReleaseList():
+                        ePrint(1, self.__ClassName, "Could not determine all fields for: " +
+                               new_track.FileInstance.Basename + "\n")
                         unfilled_tracks.append(new_track)
                         continue
+                    
+                    #
+                    # now we process the result list
+                    #
+                    
+                    # invoke the user if we have found more than one results
+                    if len(res_page.GetReleaseList()) > 1:
+                        ePrint(1, self.__ClassName,
+                               "Multiple possilble releases found for: " + new_track.FileInstance.Basename +
+                               "Please type number. 0 to skip.")
+                        c = 1
+                        for r in res_page.GetReleaseList():
+                            print("{:4d} : {!s:.150}".format(c, r))
+                            c += 1
 
-                    # choose result, pay attention on index
-                    release_candidate = res_page.GetReleaseList()[choice - 1]
-                else:
-                    release_candidate = res_page.GetReleaseList()[0]
+                        choice = -1
+                        while choice < 0 or choice > len(res_page.GetReleaseList()):
+                            choice = int(input(" <-- "))
 
-                # create a ReleasePage, from the release candidate . This determines all relevant 
-                # information for the release
-                rel_page = Chemical.ReleasePage(release_candidate)
+                        if choice == 0:
+                            ePrint(1, self.__ClassName, "Skipping: " + new_track.FileInstance.Basename + "\n")
+                            unfilled_tracks.append(new_track)
+                            continue
+
+                        # choose result, pay attention on index
+                        release_candidate = res_page.GetReleaseList()[choice - 1]
+                    else:
+                        release_candidate = res_page.GetReleaseList()[0]
+
+                    # create a ReleasePage, from the release candidate . This determines all relevant 
+                    # information for the release
+                    rel_page = Chemical.ReleasePage(release_candidate)
+
 
                 #
                 # identify the track in the release
@@ -167,6 +214,8 @@ class Main:
 
                 if new_track.FilledEnough(self.Settings.Pattern):
                     ePrint(1, self.__ClassName, "Track is filled enough: " + str(new_track))
+                    # link to the found release
+                    new_track.Release = rel_page
                     filled_tracks.append(new_track)
                 else:
                     ePrint(1, self.__ClassName, "Could not determine all fields for: " + new_track.FileInstance.Basename)
@@ -174,10 +223,6 @@ class Main:
 
                 print()
 
-        #
-        # Handle Directories (Release Search)
-        #
-                    
         #
         # Rename files
         #
@@ -191,6 +236,43 @@ class Main:
                 pass
             else:
                 track.FileInstance.RenameQuery(dest_name)
+
+
+        #
+        # handle dir renaming
+        #
+        handled_dirs = []
+        for track in filled_tracks:
+            if track.FileInstance.RelDir and track.FileInstance.RelDir not in handled_dirs:
+                # build a artist string, maximum 2
+                artists = ""
+                c = 0
+                for t in track.Release.TrackList:
+                    artists += t.Artist + " "
+                    if c >= 1:
+                        break
+                    c += 1
+                
+                # create destination string
+                artists = artists.strip()
+                artists = ReplaceChars(" ", ".", artists)
+                artists = artists.lower()
+                
+                dest = track.Release.Catid.lower() + ".-." + artists
+                ePrint(2, self.__ClassName, track.FileInstance.RelDir)
+                ePrint(2, self.__ClassName, dest)
+
+                RenameDirQuery(track.FileInstance.RelDir, dest)
+
+                handled_dirs.append(track.FileInstance.RelDir)
+
+                
+
+                
+
+
+                
+                
 
         #
         # handle searchterms
