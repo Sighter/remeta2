@@ -136,7 +136,7 @@ class Main:
                     # if we found nothing, we cut the searchterm
                     if not res_page.GetReleaseList():
                         # at first remove signs symbols and retry
-                        search_term = ReplaceChars("/_()-.:,", " ", search_term)
+                        search_term = ReplaceChars("/_()-.:,&", " ", search_term)
                         # strip "feat" terms
                         p = re.compile(" feat ", re.IGNORECASE)
                         search_term = p.sub("", search_term)
@@ -147,6 +147,17 @@ class Main:
                             # second remove numbers
                             search_term = ReplaceChars("0123456789", " ", search_term)
                             res_page = Chemical.ResultPage(search_term)
+
+                            # now strip words from the term
+                            if not res_page.GetReleaseList():
+                                search_term_word_list = search_term.split()
+                                while len(search_term_word_list) > 1:
+                                    search_term_word_list.pop()
+                                    search_term = " ".join(search_term_word_list)
+                                    res_page = Chemical.ResultPage(search_term)
+                                    if res_page.GetReleaseList():
+                                        break
+                                
                     
                     
                     # if we finally found nothing, skip
