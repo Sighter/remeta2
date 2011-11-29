@@ -71,7 +71,9 @@ class Main:
                 for file_path in file_list:
                     f = File(file_path)
                     f.RelDir = folder
-                    self.Settings.FileList.append(f)
+                    ePrint(2, "Fileending: ", str(file_list) + "\n")
+                    if f.Type in ["mp3", "flac", "wav", "wave", "ogg"]:
+                        self.Settings.FileList.append(f)
 
 
         ##
