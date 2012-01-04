@@ -275,21 +275,29 @@ class Main:
         handled_dirs = []
         for track in filled_tracks:
             if track.FileInstance.RelDir and track.FileInstance.RelDir not in handled_dirs:
+                #TODO remove code here
                 # build a artist string, maximum 2
-                artists = ""
-                c = 0
-                for t in track.Release.TrackList:
-                    artists += t.Artist + " "
-                    if c >= 1:
-                        break
-                    c += 1
+                #artists = ""
+                #c = 0
+                #for t in track.Release.TrackList:
+                #    artists += t.Artist + " "
+                #    if c >= 1:
+                #        break
+                #    c += 1
+
+                #print("Artist name: " + artists)
+                #
+                ## create destination string
+                #artists = artists.strip()
+                #artists = ReplaceChars(" ", ".", artists)
+                #artists = artists.lower()
+
+                rel_name = track.Release.Name.strip()
+                rel_name = ReplaceChars("/'", "", rel_name)
+                rel_name = ReplaceChars(" ", ".", rel_name)
+                rel_name = rel_name.lower()
                 
-                # create destination string
-                artists = artists.strip()
-                artists = ReplaceChars(" ", ".", artists)
-                artists = artists.lower()
-                
-                dest = track.Release.Catid.lower() + ".-." + artists
+                dest = track.Release.Catid.lower() + ".-." + rel_name
                 ePrint(2, self.__ClassName, track.FileInstance.RelDir)
                 ePrint(2, self.__ClassName, dest)
 
