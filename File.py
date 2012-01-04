@@ -79,6 +79,14 @@ class File:
         if choice == "y":
             rename(self.Path, dest)
 
+    ## method to rename an file without a user query
+    #
+    def Rename(self, dest):
+        dest = path.join(path.dirname(self.Path), dest + "." + self.Type)
+        ePrint(1, ":", "Renameing: " + self.Path + " --> " + dest)
+        
+        rename(self.Path, dest)
+
 
 ## Modul test
 #

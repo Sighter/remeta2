@@ -43,6 +43,9 @@ class Settings:
         parser.add_option("-w", "--cemelot", action = "store_true",
                           help = "use Cemelot format for keys")
 
+        parser.add_option("-a", "--ask", action = "store_true",
+                          help = "ask user if files are renamed")
+
         parser.add_option("-v", "--verb-level", action = "store", type= "int",
                           dest = "verblevel", help = "specify a verbosity level")
 
@@ -53,6 +56,7 @@ class Settings:
         parser.set_defaults(cemelot = False)
         parser.set_defaults(verblevel = 1)
         parser.set_defaults(pattern = "")
+        parser.set_defaults(ask = False)
 
         (options, args) = parser.parse_args(arguments)
 
@@ -72,6 +76,9 @@ class Settings:
 
         # toggle use of crappy chemelot notation
         self.UseChemelot = options.cemelot
+
+        # ask or not ask user
+        self.Ask = options.ask
 
         # set verbosity level
         # TODO: remove messi global variable

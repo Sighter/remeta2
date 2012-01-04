@@ -263,7 +263,10 @@ class Main:
                 #track.FileInstance.Copy(dest_name)
                 pass
             else:
-                track.FileInstance.RenameQuery(dest_name)
+                if self.Settings.Ask == True:
+                    track.FileInstance.RenameQuery(dest_name)
+                else:
+                    track.FileInstance.Rename(dest_name)
 
 
         #
