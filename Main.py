@@ -54,6 +54,8 @@ class Main:
             # the next loop then cares about and first makes
             # a search in a release cache
 
+            idx = 0
+
             for folder in self.Settings.DirList:
 
                 #
@@ -72,9 +74,13 @@ class Main:
                 for file_path in file_list:
                     f = File(file_path)
                     f.RelDir = folder
+
+                    f.RelDirIdx = idx
                     #ePrint(2, "Fileending: ", str(file_list) + "\n")
                     if f.Type in ["mp3", "flac", "wav", "wave", "ogg"]:
                         self.Settings.FileList.append(f)
+
+                idx += 1
 
 
         ##
@@ -123,15 +129,23 @@ class Main:
                     # look at chemical if nothing is found in tags or cache
                     #
 
-                    # if we have artist and filename availible set this as searchterm
-                    if new_track.Artist and new_track.Title:
-                        search_term = new_track.Artist + " " + new_track.Title
+                    # first we check for an explicit searchterm
+                    idx = new_track.FileInstance.RelDirIdx
+                    
+                    if idx < len(self.Settings.SearchTermList):
+                        search_term = self.Settings.SearchTermList[idx]
                     else:
-                        # otherwise create search_term from filename
-                        search_term = new_track.FileInstance.NameBody
-                        ePrint(2, self.__ClassName, "Setting searchterm: " + search_term)
+                        # if we have artist and filename availible set this as searchterm
+                        if new_track.Artist and new_track.Title:
+                            search_term = new_track.Artist + " " + new_track.Title
+                        else:
+                            # otherwise create search_term from filename
+                            search_term = new_track.FileInstance.NameBody
+                            ePrint(2, self.__ClassName, "Setting searchterm: " + search_term)
 
-                    # link it up on chemical
+
+
+                    # link it up on Beatport
                     res_page = Beatport.ResultPage(search_term)
 
                     # if we found nothing, we cut the searchterm

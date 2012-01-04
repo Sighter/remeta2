@@ -31,6 +31,7 @@ class File:
         t, b = self.GetSuffix()
 
         self.RelDir = ""
+        self.RelDirIdx = 0
 
         # set type
         if t:
