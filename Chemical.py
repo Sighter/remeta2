@@ -26,7 +26,7 @@ class ResultPage:
     # The ResultPage is nearly completely constructed here
     #
     def __init__(self, searchTerm):
-        self.__ClassName = "ResultPage"
+        self.__ClassName = "Chemical.ResultPage"
         self.__ReleaseList = []
 
         # set the base link for searching

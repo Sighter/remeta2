@@ -134,7 +134,7 @@ class Release:
         s = name + " : " + catid + " : " + label_name
 
         if self.InfoPageLink:
-            s += " : " + self.InfoPageLink
+            s += " : " + str(self.InfoPageLink)
 
         return s
 
