@@ -130,12 +130,10 @@ class ReleasePage(Release):
         # ask beatport api
         #
         conn = http.client.HTTPConnection("api.beatport.com")
-        conn.request("GET", "/catalog/3/tracks?releaseId=" + str(self.InfoPageLink))
+        conn.request("GET", "/catalog/2/tracks?perPage=50&releaseId=" + str(self.InfoPageLink))
         r1 = conn.getresponse()
-        #print(r1.status, r1.reason)
         
         mydict = json.loads(r1.read().decode())
-        #print(json.dumps(mydict["results"], sort_keys=True, indent=4))
 
         # No results 
         if len(mydict["results"]) == 0:
@@ -144,9 +142,11 @@ class ReleasePage(Release):
 
         # get track info
         t_number = 0
+
         for tr in mydict["results"]:
             cur_track = Track()
-            
+
+
             if tr["artists"]:
                 c = 1   
                 for a in tr["artists"]:
