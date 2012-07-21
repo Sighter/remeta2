@@ -71,7 +71,7 @@ class File:
     #
     def RenameQuery(self, dest):
         dest = path.join(path.dirname(self.Path), dest + "." + self.Type)
-        ePrint(1, ":", "Rename: " + self.Path + " --> " + dest, end=" ? ")
+        ePrint(1, ":", "Rename: " + path.basename(self.Path) + " --> " + path.basename(dest), end=" ? ")
         choice = "k"
         while choice != "y" and choice != "n":
             choice = input("(y/n): ")
@@ -83,7 +83,7 @@ class File:
     #
     def Rename(self, dest):
         dest = path.join(path.dirname(self.Path), dest + "." + self.Type)
-        ePrint(1, ":", "Renameing: " + self.Path + " --> " + dest)
+        ePrint(1, ":", "Renameing: " + path.basename(self.Path) + " --> " + path.basename(dest))
         
         rename(self.Path, dest)
 

@@ -228,7 +228,7 @@ class Main:
                 search_term = ReplaceChars("/_()-.:,", " ", search_term)
 
                 cor_track = rel_page.IdentifyTrack(search_term)
-                ePrint(2, self.__ClassName, "corresponding track: " + str(cor_track))
+                ePrint(1, self.__ClassName, "corresponding track: " + str(cor_track))
 
                 # since we only have a corresponding track copy on demand
                 if not new_track.Artist:
