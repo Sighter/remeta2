@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 # Beatport.py -- Handle Beatport API
-# @Author:      The Sighter (sighter@resource-dnb.de)
+# @Author:      The Sighter (sighter@resource-dnb.de) & The Füttel (achterin@googlemail.com)
 # @License:     GPL
 # @Created:     2011-11-30.
 # @Revision:    0.1
@@ -141,20 +141,20 @@ class ReleasePage(Release):
 
 
         # get track info
-        t_number = 0
+        t_number = 1
 
         for tr in mydict["results"]:
             cur_track = Track()
 
+            # print(tr["artists"])
 
             if tr["artists"]:
-                c = 1   
+                cur_track.Artist = ""
                 for a in tr["artists"]:
-                    cur_track.Artist = ""
                     if a["type"] == "artist":
-                        cur_track.Artist += a["name"]
-                        if c < len(tr["artists"]):
-                            cur_track.Artist += ", "
+                        cur_track.Artist += a["name"] + ", "
+
+            cur_track.Artist = cur_track.Artist.rstrip(", ")
             
             if tr["title"]:
                 cur_track.Title = tr["title"]
