@@ -3,3 +3,5 @@ test.files
 __pycache__
 remeta2
 *.swp
+*.sublime
+*.sublime-workspace

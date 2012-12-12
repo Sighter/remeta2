@@ -15,6 +15,7 @@ from File import File
 from Helpers import ePrint
 from Helpers import ReplaceChars
 from Helpers import RenameDirQuery
+from Helpers import DownloadFile
 import Chemical
 import Beatport
 
@@ -300,6 +301,16 @@ class Main:
                 dest = track.Release.Catid.lower() + ".-." + rel_name
                 ePrint(2, self.__ClassName, track.FileInstance.RelDir)
                 ePrint(2, self.__ClassName, dest)
+
+                # download artwork if necessary
+                if self.Settings.GetImage == True:
+                    image_path = os.path.join(track.FileInstance.RelDir, "artwork.jpg")
+                    if os.path.exists(image_path):
+                        ePrint(1, self.__ClassName, "Artwork already in release folder")
+                    else:
+                        ePrint(1, self.__ClassName, "Downloading Artwork")
+                        DownloadFile(track.Release.PictureLink, image_path)
+
 
                 RenameDirQuery(track.FileInstance.RelDir, dest)
 

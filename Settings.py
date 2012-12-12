@@ -52,11 +52,15 @@ class Settings:
         parser.add_option("-p", "--pattern", action = "store", type= "string",
                           help = "specify a verbosity level")
 
+        parser.add_option("-i", "--get-image", action = "store_true", dest = "getimage",
+                          help = "download release artwork if release search is invoked")
+
         parser.set_defaults(copy = False)
         parser.set_defaults(cemelot = False)
         parser.set_defaults(verblevel = 1)
         parser.set_defaults(pattern = "")
         parser.set_defaults(ask = False)
+        parser.set_defaults(getimage = False)
 
         (options, args) = parser.parse_args(arguments)
 
@@ -79,6 +83,9 @@ class Settings:
 
         # ask or not ask user
         self.Ask = options.ask
+
+        # get image flag
+        self.GetImage = options.getimage
 
         # set verbosity level
         # TODO: remove messi global variable

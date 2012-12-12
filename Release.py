@@ -109,6 +109,7 @@ class Release:
         self.Name  = name
         self.LabelName = labelName
         self.InfoPageLink = infoPageLink
+        self.PictureLink = ""
         self.TrackList = []
 
     ##============================= OPERATIONS ===================================##
