@@ -138,6 +138,7 @@ class ReleasePage(Release):
         # No results 
         if len(mydict["results"]) == 0:
             return None
+        #print(json.dumps(mydict["results"], sort_keys=True, indent=4))
 
 
         # get track info
@@ -151,7 +152,7 @@ class ReleasePage(Release):
         for tr in mydict["results"]:
             cur_track = Track()
 
-            # print(tr["artists"])
+            print(tr["artists"])
 
             if tr["artists"]:
                 cur_track.Artist = ""
@@ -172,7 +173,7 @@ class ReleasePage(Release):
             t_key = ""
 
             # get key 
-            if tr["key"]["standard"]:
+            if tr["key"] and tr["key"]["standard"]:
                 t_key += tr["key"]["standard"]["letter"]
                 if tr["key"]["standard"]["sharp"] == True:
                     t_key += " Sharp"
