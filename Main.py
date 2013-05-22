@@ -16,6 +16,8 @@ from Helpers import ePrint
 from Helpers import ReplaceChars
 from Helpers import RenameDirQuery
 from Helpers import DownloadFile
+from Helpers import ColorString
+
 import Chemical
 import Beatport
 
@@ -62,7 +64,8 @@ class Main:
                 #
                 # figure out the directory entries
                 #
-                file_list = glob.glob(os.path.join(folder, "*"))
+                file_list = os.listdir(folder)
+                
 
                 if not file_list:
                     ePrint(1, self.__ClassName, "Skipping directory " + folder)
@@ -73,7 +76,7 @@ class Main:
 
                 # append them to the FileList
                 for file_path in file_list:
-                    f = File(file_path)
+                    f = File(os.path.join(folder, file_path))
                     f.RelDir = folder
 
                     f.RelDirIdx = idx
@@ -104,7 +107,7 @@ class Main:
                 new_track.FileInstance = f
                 new_track.FillFromFile()
 
-                ePrint(1, str(new_track.FileInstance.NameBody), "<-- Try to determine info")
+                ePrint(1, ColorString(str(new_track.FileInstance.NameBody), "green"), "<-- Try to determine info")
 
                 # if a track is fully filled continue with the next
                 if (new_track.FilledEnough(self.Settings.Pattern)):
@@ -229,7 +232,7 @@ class Main:
                 search_term = ReplaceChars("/_()-.:,", " ", search_term)
 
                 cor_track = rel_page.IdentifyTrack(search_term)
-                ePrint(1, self.__ClassName, "corresponding track: " + str(cor_track))
+                ePrint(1, self.__ClassName, "corresponding track: " + ColorString(str(cor_track), 'green'))
 
                 # since we only have a corresponding track copy on demand
                 if not new_track.Artist:

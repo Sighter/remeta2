@@ -89,9 +89,6 @@ def subinstr(list,newstr):
     return newstr
 # end of subinstr }}} #
 
-
-
-
 # function -- getWebAsSrc () {{{
 # @ url
 # < decoded string
@@ -143,3 +140,13 @@ def DownloadFile(url, file_name):
     # Download the file from `url` and save it locally under `file_name`:
     with urllib.request.urlopen(url) as response, open(file_name, 'wb') as out_file:
         shutil.copyfileobj(response, out_file)
+
+
+# function to colorize a strint
+def ColorString(string, color):
+    
+    if color == "green":
+        string = "\33[32m" + string + "\033[0m"
+
+    return string
+

@@ -147,12 +147,12 @@ class ReleasePage(Release):
         # we have to get the picture link from the first picture
         if mydict["results"][0]["images"]["large"]["url"]:
             self.PictureLink = mydict["results"][0]["images"]["large"]["url"]
-            print(self.PictureLink)
+            #print(self.PictureLink)
 
         for tr in mydict["results"]:
             cur_track = Track()
 
-            print(tr["artists"])
+            #print(tr["artists"])
 
             if tr["artists"]:
                 cur_track.Artist = ""
