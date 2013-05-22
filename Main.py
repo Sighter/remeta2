@@ -195,6 +195,8 @@ class Main:
                         ePrint(1, self.__ClassName,
                                "Multiple possilble releases found for: " + new_track.FileInstance.Basename +
                                "Please type number. 0 to skip.")
+
+                        # TODO print sorted
                         c = 1
                         for r in res_page.GetReleaseList():
                             print("{:4d} : {!s:.150}".format(c, r))
