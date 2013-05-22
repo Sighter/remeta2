@@ -200,8 +200,8 @@ class Release:
                 if s in search_target_list:
                     item_hits += 1
 
-            # calculate a value wich is relative to the length of the search_target_list
-            item_hits = item_hits / len(search_target_list)
+            # calculate a value wich is relative to the length of the search_term_list
+            item_hits = item_hits / len(search_term_list)
             ePrint(2, sFktname, "Ranking points: " + str(item_hits))
             
             # create a matchcount, item tupel
