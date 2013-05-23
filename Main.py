@@ -197,13 +197,18 @@ class Main:
                                "Please type number. 0 to skip.")
 
                         # TODO print sorted
+                        release_list = res_page.GetReleaseList()
+                        
+                        # sort the release list for better choosing
+                        release_list = sorted(release_list, key = lambda rel: str(rel), reverse = False)
+
                         c = 1
-                        for r in res_page.GetReleaseList():
+                        for r in release_list:
                             print("{:4d} : {!s:.150}".format(c, r))
                             c += 1
 
                         choice = -1
-                        while choice < 0 or choice > len(res_page.GetReleaseList()):
+                        while choice < 0 or choice > len(release_list):
                             choice = int(input(" <-- "))
 
                         if choice == 0:
@@ -212,9 +217,9 @@ class Main:
                             continue
 
                         # choose result, pay attention on index
-                        release_candidate = res_page.GetReleaseList()[choice - 1]
+                        release_candidate = release_list[choice - 1]
                     else:
-                        release_candidate = res_page.GetReleaseList()[0]
+                        release_candidate = release_list[0]
 
                     # create a ReleasePage, from the release candidate . This determines all relevant 
                     # information for the release
