@@ -189,9 +189,10 @@ class Main:
                     #
                     # now we process the result list
                     #
+                    release_list = res_page.GetReleaseList()
                     
                     # invoke the user if we have found more than one results
-                    if len(res_page.GetReleaseList()) > 1:
+                    if len(release_list) > 1:
                         ePrint(1, self.__ClassName,
                                "Multiple possilble releases found for: " + new_track.FileInstance.Basename +
                                "Please type number. 0 to skip.")
