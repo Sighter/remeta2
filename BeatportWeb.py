@@ -200,7 +200,7 @@ class ReleasePage(Release):
 
         artwork = artwork.find('img')
 
-        artwork = artwork['src'].lstrip('/')
+        artwork = artwork['data-lazy-load-src'].lstrip('/')
 
         link_list = artwork.split('/')
         link_list[2] = '500x500'
