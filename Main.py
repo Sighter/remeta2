@@ -19,7 +19,8 @@ from Helpers import DownloadFile
 from Helpers import ColorString
 
 import Chemical
-import Beatport
+import BeatportWeb
+
 
 
 # class to manage main functions of the script
@@ -149,8 +150,8 @@ class Main:
 
 
 
-                    # link it up on Beatport
-                    res_page = Beatport.ResultPage(search_term)
+                    # link it up on BeatportWeb
+                    res_page = BeatportWeb.ResultPage(search_term)
 
                     # if we found nothing, we cut the searchterm
                     if not res_page.GetReleaseList():
@@ -160,12 +161,12 @@ class Main:
                         p = re.compile(" feat ", re.IGNORECASE)
                         search_term = p.sub("", search_term)
 
-                        res_page = Beatport.ResultPage(search_term)
+                        res_page = BeatportWeb.ResultPage(search_term)
 
                         if not res_page.GetReleaseList():
                             # second remove numbers
                             search_term = ReplaceChars("0123456789", " ", search_term)
-                            res_page = Beatport.ResultPage(search_term)
+                            res_page = BeatportWeb.ResultPage(search_term)
 
                             # now strip words from the term
                             if not res_page.GetReleaseList():
@@ -173,7 +174,7 @@ class Main:
                                 while len(search_term_word_list) > 1:
                                     search_term_word_list.pop()
                                     search_term = " ".join(search_term_word_list)
-                                    res_page = Beatport.ResultPage(search_term)
+                                    res_page = BeatportWeb.ResultPage(search_term)
                                     if res_page.GetReleaseList():
                                         break
                                 
@@ -224,7 +225,7 @@ class Main:
 
                     # create a ReleasePage, from the release candidate . This determines all relevant 
                     # information for the release
-                    rel_page = Beatport.ReleasePage(release_candidate)
+                    rel_page = BeatportWeb.ReleasePage(release_candidate)
 
 
                 #
