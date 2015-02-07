@@ -36,7 +36,6 @@ class ResultPage:
         self.__ClassName = "Beatport.ResultPage"
         self.__ReleaseList = []
 
-
         # strip whitespaces on the edges
         searchTerm = searchTerm.strip()
 
@@ -55,63 +54,67 @@ class ResultPage:
             return
 
         # maka request
-        base = 'http://www.beatport.com/search?facets%5B0%5D=fieldType%3Arelease&facets%5B1%5D=territoryISOName%3ADE&query={0}&perPage=150&sortBy=&returnFacets=fieldType%2CgenreName%2ClabelName%2CartistName%2CreleaseTypeName&countryCode=DE&realtimePrices=true&sourceType=sushi&format=json&appid=Sushi'
+        base = 'https://pro.beatport.com/search/releases?q={0}'
         base = base.format(searchTerm)
 
         r = requests.get(base)
 
         html = r.text
 
-        # make a socket connection to the beatport api
-        #conn = http.client.HTTPConnection("api.beatport.com")
-        #conn.request("GET", "/catalog/3/search?query=" + searchTerm + "&facets[]=fieldType:release&perPage=500")
-        #r1 = conn.getresponse()
-        #print(r1.status, r1.reason)
-        
-        #mydict = json.loads(r1.read().decode())
-        # print(json.dumps(mydict["results"], sort_keys=True, indent=4))
+        self.__ReleaseList = self._get_releases(html, base)
 
-        #for entry in mydict["results"]:
-        #    print(entry["name"])
+    def _get_releases(self, html, query_link):
+        # see if we hav multiple pages
+        soup = BeautifulSoup(html, "lxml")
 
-        #print(len(mydict["results"]))
-        
-        # Check for nothing found
-        #if len(mydict["results"]) == 0:
-        #   return None
+        page_numbers = soup.find_all(True, class_='pagination-number')
+
+        if len(page_numbers) == 0:
+            return self._get_releases_paginated(html)
+        else:
+            releases = []
+            page_count = len(page_numbers)
+            ePrint(1, self.__ClassName, "Found " + str(page_count) + " pages")
+
+            for c in range(1, page_count + 1):
+                r = requests.get(query_link + '&page=' + str(c))
+                html = r.text
+
+                releases = releases + self._get_releases_paginated(html)
+
+            return releases
 
 
-
-        self.__ReleaseList = self._get_releases(html)
-    
-    
-    
-    def _get_releases(self, html):
+    def _get_releases_paginated(self, html):
 
         soup = BeautifulSoup(html, "lxml")
-        items = soup.find_all('div', class_='item-meta')
+        items = soup.find_all('li', class_='release')
         rel_list = []
-        
+
         for item in items:
 
             new_rel = Release()
 
-            name = item.find('a', class_='item-title')
-            link = name['href']
+            name = item.find('p', class_='release-title')
+
+            link = name.find('a')
+            link = link['href']
+
             name = name.text
-                        
-            artists = item.find('span', class_='item-list')
+
+            artists = item.find('p', class_='release-artists')
             artists = artists.text.strip()
             artists = re.sub(' +', ' ', artists)
-            
-            label = item.find('a', attrs={'data-type': 'label'})
+            artists = " ".join(artists.split())
+
+            label = item.find('p', class_="release-label")
             label = label.text.strip()
             label = re.sub(' +', ' ', label)
-            
+
 
             new_rel.Name = name
             new_rel.LabelName = label
-            new_rel.InfoPageLink = link
+            new_rel.InfoPageLink = 'http://pro.beatport.com' + link
 
             rel_list.append(new_rel)
 
@@ -172,23 +175,14 @@ class ReleasePage(Release):
         
         self.TrackList = self._get_tracks(html)
 
-        # get keys
-        for t in self.TrackList:
-
-            link = t.SnippetLink
-            r = requests.get(link)
-            html = r.text
-
-            t.Key = self._get_key(html)
-
         #print(self.GetLongString())
 
     def _get_catalog_id(self, html):
 
         soup = BeautifulSoup(html, 'lxml')
-        label_data = soup.find('td', class_='meta-data-label', text='Catalog #')
+        label_data = soup.find('span', class_='category', text='Catalog')
 
-        cat_id = label_data.find_next_sibling('td')
+        cat_id = label_data.find_next_sibling('span')
         cat_id = cat_id.text
 
         return cat_id
@@ -196,47 +190,46 @@ class ReleasePage(Release):
     def _get_artwork_link(self, html):
 
         soup = BeautifulSoup(html, 'lxml')
-        artwork = soup.find_all('span', class_='artwork')[0]
+        artwork = soup.find('img', class_='interior-release-chart-artwork')
 
-        artwork = artwork.find('img')
-
-        artwork = artwork['data-lazy-load-src'].lstrip('/')
-
-        link_list = artwork.split('/')
-        link_list[2] = '500x500'
-
-        link = ''.join([s + '/' for s in link_list])
-
-        return 'http://' + link.rstrip('/')
-
-        
+        artwork = artwork['src']
+        return artwork
 
     def _get_tracks(self, html):
 
         soup = BeautifulSoup(html, 'lxml')
-        tcs = soup.find_all('td', class_='titleColumn')
+        tcs = soup.find_all('li', class_='track')
         count = 1
 
         tracks = []
 
-        for title_column in tcs:
+        for item in tcs:
             new_track = Track()
 
-            title = title_column.find('a', class_='txt-larger')
-            track_link = title['href']
-            title = title.find_all('span')
-            title = title[0].text + ' (' + title[1].text + ')'
+            title = item.find('span', class_='buk-track-primary-title')
+            title = title.text
 
-            artist_list = title_column.find('span', class_='artistList')
+            title_remixed = item.find('span', class_='buk-track-remixed')
+            title = title + ' (' + title_remixed.text + ')'
+            title = " ".join(title.split())
+
+            artist_list = item.find('p', class_='buk-track-artists')
             artist_list = artist_list.text
+            artist_list = artist_list.strip()
+            artist_list = " ".join(artist_list.split())
+
+            key = item.find('p', class_='buk-track-key')
+            key = key.text
+            key = self.ConvertKey(key)
+
 
             track_number = count
             count += 1
 
             new_track.Artist = artist_list
             new_track.Title = title
-            new_track.SnippetLink = track_link
             new_track.Number = track_number
+            new_track.Key = key
 
             tracks.append(new_track)
 
@@ -256,30 +249,30 @@ class ReleasePage(Release):
 
     def ConvertKey(self, bpKey):
         quint_map = {
-                     'G#min' : 'gismoll',
-                     'D#min' : 'dismoll',
-                     'A#min' : 'bmoll',
-                     'Fmin' : 'fmoll',
-                     'Cmin' : 'cmoll',
-                     'Gmin' : 'gmoll',
-                     'Dmin' : 'dmoll',
-                     'Amin' : 'amoll',
-                     'Emin' : 'emoll',
-                     'Bmin' : 'hmoll',
-                     'F#min' : 'fismoll',
-                     'C#min' : 'cismoll',
-                     'Bmaj' : 'hdur',
-                     'F#maj' : 'fisdur',
-                     'C#maj' : 'desdur',
-                     'G#maj' : 'asdur',
-                     'D#maj' : 'esdur',
-                     'A#maj' : 'bdur',
-                     'Fmaj' : 'fdur',
-                     'Cmaj' : 'cdur',
-                     'Gmaj' : 'gdur',
-                     'Dmaj' : 'ddur',
-                     'Amaj' : 'adur',
-                     'Emaj' : 'edur',
+                     'G♯ min' : 'gismoll',
+                     'D♯ min' : 'dismoll',
+                     'A♯ min' : 'bmoll',
+                     'F min' : 'fmoll',
+                     'C min' : 'cmoll',
+                     'G min' : 'gmoll',
+                     'D min' : 'dmoll',
+                     'A min' : 'amoll',
+                     'E min' : 'emoll',
+                     'B min' : 'hmoll',
+                     'F♯ min' : 'fismoll',
+                     'C♯ min' : 'cismoll',
+                     'B maj' : 'hdur',
+                     'F♯ maj' : 'fisdur',
+                     'C♯ maj' : 'desdur',
+                     'G♯ maj' : 'asdur',
+                     'D♯ maj' : 'esdur',
+                     'A♯ maj' : 'bdur',
+                     'F maj' : 'fdur',
+                     'C maj' : 'cdur',
+                     'G maj' : 'gdur',
+                     'D maj' : 'ddur',
+                     'A maj' : 'adur',
+                     'E maj' : 'edur',
                     }
         if bpKey in quint_map:
             return quint_map[bpKey]
